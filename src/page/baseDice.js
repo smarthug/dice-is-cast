@@ -3,8 +3,8 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import GUI from "lil-gui";
 
-import * as CANNON from "cannon";
-import { DiceManager, DiceD6 } from "threejs-dice/lib/dice";
+import * as CANNON from "cannon-es";
+import { DiceManager, DiceD6 } from "threejs-dice-es/lib/dice";
 
 let renderer, camera, controls;
 
@@ -167,67 +167,75 @@ export default function Main() {
             new CANNON.Vec3(1, 0, 0),
             -Math.PI / 2
         );
-        world.add(floorBody);
+        world.addBody(floorBody);
 
         // //Walls
 
         var colors = ["#ff0000", "#ffff00", "#00ff00", "#0000ff", "#ff00ff"];
-        for (var i = 0; i < 5; i++) {
+        for (var i = 0; i < 4; i++) {
             var die = new DiceD6({ size: 1.5, backColor: colors[i] });
-            console.log(die)
-            let tmp = die.getObject()
-            console.log(die.getObject())
-            // scene.add(die.getObject());
+            // console.log(die)
+            // let tmp = die.getObject()
+            // console.log(die.getObject())
+            scene.add(die.getObject());
             // scene.add(tmp);
 
             dice.push(die);
         }
 
         console.log(scene)
+
+        const guiObj = {
+            throw:randomDiceThrow
+        }
+       gui.add(guiObj,"throw")
     }
 
     function sceneInit() { }
 
 
-    // function randomDiceThrow() {
-    //     var diceValues = [];
+    function randomDiceThrow() {
+        var diceValues = [];
 
-    //     for (var i = 0; i < dice.length; i++) {
-    //         let yRand = Math.random() * 20;
-    //         dice[i].getObject().position.x = -15 - (i % 3) * 1.5;
-    //         dice[i].getObject().position.y = 2 + Math.floor(i / 3) * 1.5;
-    //         dice[i].getObject().position.z = -15 + (i % 3) * 1.5;
-    //         dice[i].getObject().quaternion.x =
-    //             ((Math.random() * 90 - 45) * Math.PI) / 180;
-    //         dice[i].getObject().quaternion.z =
-    //             ((Math.random() * 90 - 45) * Math.PI) / 180;
-    //         dice[i].updateBodyFromMesh();
-    //         let rand = Math.random() * 5;
-    //         dice[i]
-    //             .getObject()
-    //             .body.velocity.set(25 + rand, 40 + yRand, 15 + rand);
-    //         dice[i]
-    //             .getObject()
-    //             .body.angularVelocity.set(
-    //                 20 * Math.random() - 10,
-    //                 20 * Math.random() - 10,
-    //                 20 * Math.random() - 10
-    //             );
+        for (var i = 0; i < dice.length; i++) {
+            let yRand = Math.random() * 20;
+            dice[i].getObject().position.x = -15 - (i % 3) * 1.5;
+            dice[i].getObject().position.y = 2 + Math.floor(i / 3) * 1.5;
+            dice[i].getObject().position.z = -15 + (i % 3) * 1.5;
+            dice[i].getObject().quaternion.x =
+                ((Math.random() * 90 - 45) * Math.PI) / 180;
+            dice[i].getObject().quaternion.z =
+                ((Math.random() * 90 - 45) * Math.PI) / 180;
+            dice[i].updateBodyFromMesh();
+            let rand = Math.random() * 5;
+            dice[i]
+                .getObject()
+                .body.velocity.set(25 + rand, 40 + yRand, 15 + rand);
+            dice[i]
+                .getObject()
+                .body.angularVelocity.set(
+                    20 * Math.random() - 10,
+                    20 * Math.random() - 10,
+                    20 * Math.random() - 10
+                );
 
-    //         diceValues.push({ dice: dice[i], value: i + 1 });
-    //     }
+            diceValues.push({ dice: dice[i], value: i + 1 });
 
-    //     DiceManager.prepareValues(diceValues);
-    // }
+            dice.getUpsideValue()
+        }
+
+        DiceManager.prepareValues(diceValues);
+    }
 
     function tick() {
         const elapsedTime = clock.getElapsedTime();
 
         // world.step(1.0 / 60.0);
+        world.fixedStep();
 
-        // for (var i in dice) {
-        //     dice[i].updateMeshFromBody();
-        // }
+        for (var i in dice) {
+            dice[i].updateMeshFromBody();
+        }
 
         // Update controls
         controls.update();
