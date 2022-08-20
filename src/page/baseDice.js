@@ -9,8 +9,7 @@ import { DiceManager, DiceD6 } from "threejs-dice-es/lib/dice";
 let renderer, camera, controls;
 
 // standard global variables
-let container,
-    world,
+let world,
     dice = [];
 
 /**
@@ -21,21 +20,21 @@ let container,
 // Scene
 const scene = new THREE.Scene()
 
-const clock = new THREE.Clock()
+// const clock = new THREE.Clock()
 
 /**
  * Textures
  */
-const textureLoader = new THREE.TextureLoader()
+// const textureLoader = new THREE.TextureLoader()
 
 /**
  * Test cube
  */
-const cube = new THREE.Mesh(
-    new THREE.BoxGeometry(1, 1, 1),
-    new THREE.MeshBasicMaterial()
-)
-scene.add(cube)
+// const cube = new THREE.Mesh(
+//     new THREE.BoxGeometry(1, 1, 1),
+//     new THREE.MeshBasicMaterial()
+// )
+// scene.add(cube)
 
 /**
  * Sizes
@@ -53,6 +52,10 @@ export default function Main() {
         tick();
 
         // 나갈때 gui 해제 , 삭제 ?
+        return ()=>{
+            console.log("clean");
+            scene.children = []
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -69,7 +72,8 @@ export default function Main() {
             0.1,
             100
         );
-        camera.position.z = 3
+        camera.position.y = 14
+        camera.position.z = 13
         scene.add(camera);
 
         // Controls
@@ -105,6 +109,16 @@ export default function Main() {
         // Debug
         const gui = new GUI()
 
+        const guiObj = {
+            throw: randomDiceThrow,
+            // init: sceneInit
+        }
+
+        // gui.add(guiObj, "init")
+        gui.add(guiObj, "throw")
+    }
+
+    function sceneInit() {
         let ambient = new THREE.AmbientLight("#ffffff", 0.3);
         scene.add(ambient);
 
@@ -129,7 +143,7 @@ export default function Main() {
             color: "#00aa00",
             side: THREE.DoubleSide
         });
-        var floorGeometry = new THREE.PlaneGeometry(30, 30, 10, 10);
+        var floorGeometry = new THREE.PlaneGeometry(60, 60, 10, 10);
         var floor = new THREE.Mesh(floorGeometry, floorMaterial);
         floor.receiveShadow = true;
         floor.rotation.x = Math.PI / 2;
@@ -171,8 +185,8 @@ export default function Main() {
 
         // //Walls
 
-        var colors = ["#ff0000", "#ffff00", "#00ff00", "#0000ff", "#ff00ff"];
-        for (var i = 0; i < 4; i++) {
+        var colors = ["#ff0000", "#ffff00", "#00ff00", "#0000ff", "#ff00ff","#ffffff"];
+        for (var i = 0; i < 6; i++) {
             var die = new DiceD6({ size: 1.5, backColor: colors[i] });
             // console.log(die)
             // let tmp = die.getObject()
@@ -185,13 +199,8 @@ export default function Main() {
 
         console.log(scene)
 
-        const guiObj = {
-            throw:randomDiceThrow
-        }
-       gui.add(guiObj,"throw")
-    }
 
-    function sceneInit() { }
+    }
 
 
     function randomDiceThrow() {
@@ -221,14 +230,15 @@ export default function Main() {
 
             diceValues.push({ dice: dice[i], value: i + 1 });
 
-            dice.getUpsideValue()
+            // 최후가 아니라 당장이군 ... 
+            console.log(dice[i].getUpsideValue())
         }
 
         DiceManager.prepareValues(diceValues);
     }
 
     function tick() {
-        const elapsedTime = clock.getElapsedTime();
+        // const elapsedTime = clock.getElapsedTime();
 
         // world.step(1.0 / 60.0);
         world.fixedStep();
